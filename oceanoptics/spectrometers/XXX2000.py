@@ -36,8 +36,8 @@ class _XXX2000(_OOBase):
 
 class USB2000(_XXX2000):
 
-    def __init__(self):
-        super(USB2000, self).__init__('USB2000')
+    def __init__(self, **kwargs):
+        super(USB2000, self).__init__('USB2000', **kwargs)
 
     def _set_integration_time(self, time_us):
         """ send command 0x02 """
@@ -76,8 +76,8 @@ class USB2000(_XXX2000):
 
 class HR2000(_XXX2000):
 
-    def __init__(self):
-        super(HR2000, self).__init__('HR2000')
+    def __init__(self, **kwargs):
+        super(HR2000, self).__init__('HR2000', **kwargs)
 
     def _set_integration_time(self, time_us):
         """ send command 0x02 """
@@ -118,8 +118,8 @@ class HR2000(_XXX2000):
         
 class USB650(_XXX2000):
 
-    def __init__(self):
-        super(USB650, self).__init__('USB650')
+    def __init__(self, **kwargs):
+        super(USB650, self).__init__('USB650', **kwargs)
 
     def _set_integration_time(self, time_us):
         """ send command 0x02 """

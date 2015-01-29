@@ -13,4 +13,5 @@ from oceanoptics.spectrometers.STS import STS
 
 from oceanoptics.defines import OceanOpticsError
 
-from oceanoptics.utils import get_a_random_spectrometer
+from oceanoptics.utils import get_a_random_spectrometer, get_available_spectrometers 
+from oceanoptics.utils import get_spectrometer, list_available_spectrometers

@@ -21,6 +21,7 @@ class OceanOpticsSpectrometer(object):
     All spectrometers should inherit from this!
     (or from a class that inherits from this)
     """
+    
     def wavelengths(self, only_valid_pixels=True):
         """ returns a np.array with wavelenghts in nm """
         raise NotImplementedError
@@ -44,10 +45,10 @@ class OceanOpticsSpectrometer(object):
 
 class OceanOpticsUSBComm(object):
 
-    def __init__(self, model):
-        self._usb_init_connection(model)
+    def __init__(self, model, device=None):
+        self._usb_init_connection(model, device)
 
-    def _usb_init_connection(self, model):
+    def _usb_init_connection(self, model, device):
 
         if model not in _OOModelConfig.keys():
             raise _OOError('Unkown OceanOptics spectrometer model: %s' % model)
@@ -63,20 +64,25 @@ class OceanOpticsUSBComm(object):
         self._EPin1_size = _OOModelConfig[model]['EPin1_size']
         self._min_integration_time, self._max_integration_time = _OOMinMaxIT[model]
 
-        devices = usb.core.find(find_all=True,
-                        custom_match=lambda d: (d.idVendor==vendorId and
-                                                d.idProduct in productId))
-        # FIXME: generator fix
-        devices = list(devices)
+        if device is None:
+            #if no specific device is passed in, then search for all OO devices
+            #and open the first one.
+            devices = usb.core.find(find_all=True,
+                            custom_match=lambda d: (d.idVendor==vendorId and
+                                                    d.idProduct in productId))
+            # FIXME: generator fix
+            devices = list(devices)
 
-        try:
-            self._dev = devices.pop(0)
-        except (AttributeError, IndexError):
-            raise _OOError('No OceanOptics %s spectrometer found!' % model)
+            try:
+                self._dev = devices.pop(0)
+            except (AttributeError, IndexError):
+                raise _OOError('No OceanOptics %s spectrometer found!' % model)
+            else:
+                if devices:
+                    warnings.warn('Currently the first device matching the '
+                                  'Vendor/Product id is used')
         else:
-            if devices:
-                warnings.warn('Currently the first device matching the '
-                              'Vendor/Product id is used')
+            self._dev = device
 
         self._dev.set_configuration()
         self._USBTIMEOUT = self._dev.default_timeout * 1e-3
@@ -117,8 +123,8 @@ class OceanOpticsBase(OceanOpticsSpectrometer, OceanOpticsUSBComm):
 
     """
 
-    def __init__(self, model):
-        super(OceanOpticsBase, self).__init__(model)
+    def __init__(self, model,**kwargs):
+        super(OceanOpticsBase, self).__init__(model, **kwargs)
         self._initialize()
 
         status = self._init_robust_status()
@@ -127,9 +133,11 @@ class OceanOpticsBase(OceanOpticsSpectrometer, OceanOpticsUSBComm):
         self._pixels = status['pixels']
         self._EPspec = self._EPin1 if self._usb_speed == 0x80 else self._EPin0
         self._packet_N, self._packet_size, self._packet_func = (
-                _OOSpecConfig[model][self._usb_speed] )
+                _OOSpecConfig[self.model][self._usb_speed] )
         self._init_robust_spectrum()
-
+        
+        self._serial_number = self._query_information(0)
+        
         # XXX: differs for some spectrometers...
         #self._sat_factor = 65535.0/float(
         #      stuct.unpack('<h', self._query_information(17, raw=True)[6:8])[0])
@@ -137,12 +145,19 @@ class OceanOpticsBase(OceanOpticsSpectrometer, OceanOpticsUSBComm):
         self._nl_factors = [float(self._query_information(i)) for i in range(6,14)]
         self._wl = sum( self._wl_factors[i] *
               np.arange(self._pixels, dtype=np.float64)**i for i in range(4) )
-        self._valid_pixels = _OOValidPixels[model]
+        self._valid_pixels = _OOValidPixels[self.model]
 
     #---------------------
     # High level functions
     #---------------------
-
+    
+    @property
+    def serial_number(self):
+        """
+        The serial number of the spectrometer (string).
+        """
+        return self._serial_number
+    
     def wavelengths(self, only_valid_pixels=True):
         """returns array of wavelengths
 

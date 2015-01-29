@@ -55,12 +55,12 @@ class _XXX4000(_OOBase):
 
 class USB4000(_XXX4000):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._EPin2 = _OOModelConfig['USB4000']['EPin2']
         self._EPin6 = _OOModelConfig['USB4000']['EPin6']
         self._EPin2_size = _OOModelConfig['USB4000']['EPin2_size']
         self._EPin6_size = _OOModelConfig['USB4000']['EPin6_size']
-        super(USB4000, self).__init__('USB4000')
+        super(USB4000, self).__init__('USB4000', **kwargs)
 
 
 #----------
@@ -69,10 +69,10 @@ class USB4000(_XXX4000):
 
 class HR4000(_XXX4000):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._EPin2 = _OOModelConfig['HR4000']['EPin2']
         self._EPin6 = _OOModelConfig['HR4000']['EPin6']
         self._EPin2_size = _OOModelConfig['HR4000']['EPin2_size']
         self._EPin6_size = _OOModelConfig['HR4000']['EPin6_size']
-        super(HR4000, self).__init__('HR4000')
+        super(HR4000, self).__init__('HR4000', **kwargs)
 

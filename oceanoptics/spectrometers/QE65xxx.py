@@ -3,6 +3,7 @@
 from oceanoptics.base import OceanOpticsBase as _OOBase
 from oceanoptics.base import OceanOpticsTEC as _OOTEC
 import struct
+import numpy as np
 #----------------------------------------------------------
 
 
@@ -39,8 +40,8 @@ class _QE65xxx(_OOBase, _OOTEC):
 #--------
 
 class QE65000(_QE65xxx):
-    def __init__(self):
-        super(QE65000, self).__init__('QE65000')
+    def __init__(self, **kwargs):
+        super(QE65000, self).__init__('QE65000', **kwargs)
         # The QE65000 needs a -10 offset for calculating the wavelengths
         # due to some legacy issues...
         self._wl = sum( self._wl_factors[i] *
@@ -53,8 +54,8 @@ class QE65000(_QE65xxx):
 #----------
 
 class QE65pro(_QE65xxx):
-    def __init__(self):
-        super(QE65pro, self).__init__('QE65pro')
+    def __init__(self, **kwargs):
+        super(QE65pro, self).__init__('QE65pro', **kwargs)
         self.initialize_TEC()
 
 

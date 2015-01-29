@@ -179,8 +179,8 @@ class _STSCONSTANTS(object):
 class STS(_OOSpec, _OOUSBComm):
     """Rewrite of STS class"""
 
-    def __init__(self, integration_time=0.001):
-        super(STS, self).__init__('STS')
+    def __init__(self, integration_time=0.001, **kwargs):
+        super(STS, self).__init__('STS', **kwargs)
 
         self._const = _STSCONSTANTS
 
